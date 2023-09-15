@@ -1,0 +1,76 @@
+#------------------------------------------------------------------------------
+# Platform GCC Linux
+#------------------------------------------------------------------------------
+
+#------------------------------------------------------------------------------
+# C++ and C Export default visiblity settings
+EXP_CXX_FLAGS := -fvisibility-inlines-hidden
+EXP_CCC_FLAGS := -fvisibility=hidden 
+
+#------------------------------------------------------------------------------
+# Default C Complier Flags / Includes / Macro Definetions
+DEF_CCC_FLAGS +=-std=c++11 -fPIC  -pipe -Wall -w -D_NOT_CHECK_LICENCE
+
+#------------------------------------------------------------------------------
+# Default C++ Complier Flags / Includes / Macro Definetions
+
+#------------------------------------------------------------------------------
+# Default Application Flags / Paths / Files
+#DEF_APP_FLAGS += -Wl,-R. -z now   
+DEF_APP_FILES += -ldl -lpthread -lrt
+
+#------------------------------------------------------------------------------
+# Default Dynamic Link Library ( shared library ) Flags / Paths / Files
+#DEF_DLL_FLAGS += -shared -z now
+DEF_DLL_FLAGS += -shared  
+DEF_DLL_FILES += -ldl -lpthread -lrt
+
+#------------------------------------------------------------------------------
+# Default Static Link Library ( static library ) Flags / Paths / Files
+DEF_LIB_FLAGS += -crsv
+
+#------------------------------------------------------------------------------
+# Gdb Symbols Process ( debug symbols ) Links / Clone / Strip
+GDB_LINKS := --add-gnu-debuglink
+GDB_CLONE := --only-keep-debug
+GDB_STRIP := --strip-debug
+
+#------------------------------------------------------------------------------
+ifeq ($(TARGET_CHARSET),unicode)
+	DEF_APP_FILES += -liconv
+	DEF_DLL_FILES += -liconv
+endif
+
+#------------------------------------------------------------------------------
+ifeq ($(TARGET_RELEASE),true)
+	DEF_APP_FLAGS += -Wl,-O3 -s
+	DEF_DLL_FLAGS += -Wl,-O3 -s
+	DEF_CCC_FLAGS += -O3 -s
+else
+	DEF_CCC_FLAGS +=-ggdb3
+	DEF_DLL_FLAGS +=-ggdb3
+	DEF_APP_FLAGS +=-ggdb3
+endif
+
+#------------------------------------------------------------------------------
+ifeq ($(TARGET_MACHINE),64)
+	DEF_CCC_FLAGS += -m64
+else
+	DEF_CCC_FLAGS += -m32
+endif
+
+#------------------------------------------------------------------------------
+GDB_BUILD := objcopy
+
+#------------------------------------------------------------------------------
+CCC_BUILD := gcc
+CXX_BUILD := g++
+
+#------------------------------------------------------------------------------
+APP_BUILD := g++
+DLL_BUILD := g++
+LIB_BUILD := ar
+
+#------------------------------------------------------------------------------
+# End
+#------------------------------------------------------------------------------

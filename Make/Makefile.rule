@@ -1,0 +1,212 @@
+#------------------------------------------------------------------------------
+# Makefile.rule
+#------------------------------------------------------------------------------
+
+#------------------------------------------------------------------------------
+-include $(PROGRAMS_DIR)/Makefile.user
+
+#------------------------------------------------------------------------------
+SYMBOL_HIDE ?= true
+ifeq ($(SYMBOL_HIDE),true)
+	CCC_FLAGS += $(EXP_CCC_FLAGS)
+	CXX_FLAGS += $(EXP_CXX_FLAGS)
+endif
+
+#------------------------------------------------------------------------------
+PRECOMPILER_H ?= Precompiler.h
+ifneq ($(PRECOMPILER),)
+	PRECOMPILER_H := $(PRECOMPILER)
+endif
+
+#------------------------------------------------------------------------------
+PRECOMPILER_O := $(addsuffix .gch,$(PRECOMPILER_H))
+
+#------------------------------------------------------------------------------
+ifeq ($(TARGET_TYPE),exe)
+	SUFFIX_FILE ?= false
+endif
+
+#------------------------------------------------------------------------------
+ifneq ($(SUFFIX_FILE),false)
+	TARGET_NAME := $(addsuffix $(OUTPUT_SUFFIX),$(TARGET_NAME))
+endif
+
+#------------------------------------------------------------------------------
+ifneq ($(SUFFIX_LIBS),false)
+	INPUT_FILES := $(addsuffix $(OUTPUT_SUFFIX),$(INPUT_FILES))
+endif
+
+#------------------------------------------------------------------------------
+ifdef BUILDING_DIR
+	OBJECT_ROOT ?= $(BUILDING_DIR)/obj/$(TARGET_NAME)
+	TARGET_ROOT ?= $(BUILDING_DIR)/bin
+	SYMBOL_ROOT ?= $(BUILDING_DIR)/sym
+else
+	OBJECT_ROOT ?= .objs
+	TARGET_ROOT ?= .
+	SYMBOL_ROOT ?= .
+endif
+
+
+#------------------------------------------------------------------------------
+SOURCE_ROOT ?= .
+
+#------------------------------------------------------------------------------
+CCC_FLAGS += $(DEF_CCC_FLAGS)
+CCC_MACRO += $(DEF_CCC_MACRO)
+CCC_PATHS += $(DEF_CCC_PATHS)
+
+#------------------------------------------------------------------------------
+CXX_FLAGS += $(CCC_FLAGS) $(DEF_CXX_FLAGS)
+CXX_MACRO += $(CCC_MACRO) $(DEF_CXX_MACRO)
+CXX_PATHS += $(CCC_PATHS) $(DEF_CXX_PATHS)
+
+#------------------------------------------------------------------------------
+LIB_FLAGS += $(DEF_LIB_FLAGS) $(BUILD_FLAGS)
+LIB_PATHS += $(DEF_LIB_PATHS) 
+LIB_FILES += $(DEF_LIB_FILES) $(INPUT_FILES) $(SHARE_FILES)
+
+#------------------------------------------------------------------------------
+DLL_FLAGS += $(DEF_DLL_FLAGS) $(BUILD_FLAGS)
+DLL_PATHS += $(DEF_DLL_PATHS) $(INPUT_PATHS)
+DLL_FILES += $(DEF_DLL_FILES) $(INPUT_FILES) $(SHARE_FILES)
+
+#------------------------------------------------------------------------------
+APP_FLAGS += $(DEF_APP_FLAGS) $(BUILD_FLAGS)
+APP_PATHS += $(DEF_APP_PATHS) $(INPUT_PATHS)
+APP_FILES += $(DEF_APP_FILES) $(INPUT_FILES) $(SHARE_FILES)
+
+#------------------------------------------------------------------------------
+ifeq ($(TARGET_TYPE),exe)
+	TARGET_FILE ?= $(APP_PREFIX)$(TARGET_NAME)$(APP_SUFFIX)
+	SYMBOL_FILE ?= $(APP_PREFIX)$(TARGET_NAME)$(SYM_SUFFIX)
+	BUILDER_ARG := $(APP_FLAGS) $(APP_PATHS) $(APP_FILES)
+	BUILDER_OPT := $(CCC_MACRO)
+	BUILDER := $(APP_BUILD)
+endif
+
+#------------------------------------------------------------------------------
+ifeq ($(TARGET_TYPE),dll)
+	TARGET_FILE ?= $(DLL_PREFIX)$(TARGET_NAME)$(DLL_SUFFIX)
+	SYMBOL_FILE ?= $(DLL_PREFIX)$(TARGET_NAME)$(SYM_SUFFIX)
+	BUILDER_ARG := $(DLL_FLAGS) $(DLL_PATHS) $(DLL_FILES)
+	BUILDER_OPT := $(CCC_MACRO)
+	BUILDER := $(DLL_BUILD)
+endif
+
+#------------------------------------------------------------------------------
+ifeq ($(TARGET_TYPE),lib)
+	TARGET_FILE ?= $(LIB_PREFIX)$(TARGET_NAME)$(LIB_SUFFIX)
+	SYMBOL_FILE ?= $(LIB_PREFIX)$(TARGET_NAME)$(SYM_SUFFIX)
+	BUILDER_ARG := $(LIB_FLAGS) $(LIB_PATHS) $(LIB_FILES)
+	BUILDER_OPT := 
+	BUILDER := $(LIB_BUILD)
+endif
+
+#------------------------------------------------------------------------------
+DEP_FLAGS := -MM $(CXX_FLAGS) $(CXX_MACRO) $(CXX_PATHS)
+
+#------------------------------------------------------------------------------
+SOURCE_LIST_CPP := $(filter %.cpp,$(SOURCE_LIST))
+SOURCE_LIST_CXX := $(filter %.cxx,$(SOURCE_LIST))
+SOURCE_LIST_CC := $(filter %.cc,$(SOURCE_LIST))
+SOURCE_LIST_C := $(filter %.c,$(SOURCE_LIST))
+
+#------------------------------------------------------------------------------
+OBJECT_LIST_CPP := $(SOURCE_LIST_CPP:.cpp=.o)
+OBJECT_LIST_CXX := $(SOURCE_LIST_CXX:.cxx=.o)
+OBJECT_LIST_CC := $(SOURCE_LIST_CC:.cc=.o)
+OBJECT_LIST_C := $(SOURCE_LIST_C:.c=.o)
+
+#------------------------------------------------------------------------------
+OBJECT_FILE_CPP := $(addprefix $(OBJECT_ROOT)/,$(OBJECT_LIST_CPP))
+OBJECT_FILE_CXX := $(addprefix $(OBJECT_ROOT)/,$(OBJECT_LIST_CXX))
+OBJECT_FILE_CC := $(addprefix $(OBJECT_ROOT)/,$(OBJECT_LIST_CC))
+OBJECT_FILE_C := $(addprefix $(OBJECT_ROOT)/,$(OBJECT_LIST_C))
+
+#------------------------------------------------------------------------------
+TARGET_PATH ?= $(TARGET_ROOT)/$(TARGET_FILE)
+SYMBOL_TEMP ?= $(TARGET_ROOT)/$(SYMBOL_FILE)
+SYMBOL_PATH ?= $(SYMBOL_ROOT)/$(SYMBOL_FILE)
+
+#------------------------------------------------------------------------------
+OBJECT_FILES := $(OBJECT_FILE_CPP) $(OBJECT_FILE_CXX)
+OBJECT_FILES += $(OBJECT_FILE_CC) $(OBJECT_FILE_C)
+
+#------------------------------------------------------------------------------
+$(TARGET_PATH) : $(OBJECT_FILES)
+	$(shell if [ ! -d $(@D) ]; then mkdir -p $(@D); fi;)
+	$(BUILDER) $(BUILDER_OPT) -o $@ $(OBJECT_FILES) $(BUILDER_ARG) 
+
+#------------------------------------------------------------------------------
+$(OBJECT_FILE_CPP) : $(OBJECT_ROOT)/%.o : $(SOURCE_ROOT)/%.cpp
+	$(shell if [ ! -d $(@D) ]; then mkdir -p $(@D); fi;)
+	$(CXX_BUILD) $(CXX_FLAGS) $(CXX_MACRO) $(CXX_PATHS) -c -o $@ $<
+
+#------------------------------------------------------------------------------
+$(OBJECT_FILE_CXX) : $(OBJECT_ROOT)/%.o : $(SOURCE_ROOT)/%.cxx
+	$(shell if [ ! -d $(@D) ]; then mkdir -p $(@D); fi;)
+	$(CXX_BUILD) $(CXX_FLAGS) $(CXX_MACRO) $(CXX_PATHS) -c -o $@ $<
+
+#------------------------------------------------------------------------------
+$(OBJECT_FILE_CC) : $(OBJECT_ROOT)/%.o : $(SOURCE_ROOT)/%.cc
+	$(shell if [ ! -d $(@D) ]; then mkdir -p $(@D); fi;)
+	$(CXX_BUILD) $(CXX_FLAGS) $(CXX_MACRO) $(CXX_PATHS) -c -o $@ $<
+
+#------------------------------------------------------------------------------
+$(OBJECT_FILE_C) : $(OBJECT_ROOT)/%.o : $(SOURCE_ROOT)/%.c
+	$(shell if [ ! -d $(@D) ]; then mkdir -p $(@D); fi;)
+	$(CCC_BUILD) $(CCC_FLAGS) $(CCC_MACRO) $(CCC_PATHS) -c -o $@ $<
+
+#------------------------------------------------------------------------------
+$(SYMBOL_TEMP) : $(TARGET_PATH)
+	$(GDB_BUILD) $(GDB_CLONE) $< $@ ; $(GDB_BUILD) $(GDB_STRIP) $<
+	cd $(@D) && $(GDB_BUILD) $(GDB_LINKS)=$(SYMBOL_FILE) $<
+
+#------------------------------------------------------------------------------
+$(SYMBOL_PATH) : $(SYMBOL_TEMP)
+	$(shell if [ ! -d $(@D) ]; then mkdir -p $(@D); fi;)
+	-chmod 664 $< ; rm -f $@ ; mv $< $@
+
+#------------------------------------------------------------------------------
+$(PRECOMPILER_O) : $(PRECOMPILER_H)
+	$(shell if [ ! -d $(@D) ]; then mkdir -p $(@D); fi;)
+	$(CXX_BUILD) $(CXX_FLAGS) $(CXX_MACRO) $(CXX_PATHS) $<
+
+#------------------------------------------------------------------------------
+ifneq ($(PRECOMPILER),)
+    $(SOURCE_LIST) : $(PRECOMPILER_O)
+endif
+
+#------------------------------------------------------------------------------
+-include Makefile.deps
+
+#------------------------------------------------------------------------------
+all : $(TARGET_PATH)
+
+#------------------------------------------------------------------------------
+clean : cleanTarget cleanObject
+
+#------------------------------------------------------------------------------
+symbol : $(SYMBOL_PATH)
+
+#------------------------------------------------------------------------------
+depends : $(SOURCE_LIST)
+	$(CXX_BUILD) $(DEP_FLAGS) $(SOURCE_LIST) > Makefile.deps
+
+#------------------------------------------------------------------------------
+cleanObject :
+	-rm -f -r $(OBJECT_ROOT)
+	-rm -f $(PRECOMPILER_O)
+
+cleanTarget :
+	-rm -f $(SYMBOL_PATH)
+	-rm -f $(TARGET_PATH)
+
+#------------------------------------------------------------------------------
+.PHONY: cleanObject cleanTarget
+.PHONY: all clean symbol depends
+
+#------------------------------------------------------------------------------
+# End
+#------------------------------------------------------------------------------

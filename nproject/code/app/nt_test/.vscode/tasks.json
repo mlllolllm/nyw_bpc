@@ -1,0 +1,25 @@
+{
+
+    "tasks": [
+        {
+            "type": "cppbuild",
+            "label": "1-1",
+            "command": "make",
+            "args": [
+                
+            ],
+            "options": {
+                "cwd": "/home/devapp/nproject/code/app/test/${fileBasenameNoExtension}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "detail": "调试器生成的任务。"
+        }
+    ],
+    "version": "2.0.0"
+}

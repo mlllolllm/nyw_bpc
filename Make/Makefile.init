@@ -1,0 +1,102 @@
+#------------------------------------------------------------------------------
+# Makefile.init
+#------------------------------------------------------------------------------
+
+#------------------------------------------------------------------------------
+include ~/Make/Makefile.defs
+
+#------------------------------------------------------------------------------
+# Default Output Setting
+TARGET_CHARSET ?= ansi
+TARGET_RELEASE ?= true 
+TARGET_MACHINE ?= 64
+
+
+#------------------------------------------------------------------------------
+# Default Compiler
+COMPILER_NAME ?= GCC
+PLATFORM_NAME ?= $(shell uname -s)
+include ~/Make/Platform.$(COMPILER_NAME).$(PLATFORM_NAME)
+
+#------------------------------------------------------------------------------
+# C++ and C Export default visiblity settings
+EXP_CXX_FLAGS ?=
+EXP_CCC_FLAGS ?=
+
+#------------------------------------------------------------------------------
+# Default C Complier Flags / Includes / Macro Definetions
+DEF_CCC_FLAGS ?=
+DEF_CCC_PATHS ?=
+DEF_CCC_MACRO ?=
+
+#------------------------------------------------------------------------------
+# Default C++ Complier Flags / Includes / Macro Definetions
+DEF_CXX_FLAGS ?=
+DEF_CXX_PATHS ?=
+DEF_CXX_MACRO ?=
+
+#------------------------------------------------------------------------------
+# Default Application Flags / Paths / Files
+DEF_APP_FLAGS ?=
+DEF_APP_PATHS ?=
+DEF_APP_FILES ?=
+
+#------------------------------------------------------------------------------
+# Default Dynamic Link Library ( shared library ) Flags / Paths / Files
+DEF_DLL_FLAGS ?=
+DEF_DLL_PATHS ?=
+DEF_DLL_FILES ?=
+
+#------------------------------------------------------------------------------
+# Default Static Link Library ( static library ) Flags / Paths / Files
+DEF_LIB_FLAGS ?=
+DEF_LIB_PATHS ?=
+DEF_LIB_FILES ?=
+
+#------------------------------------------------------------------------------
+ifeq ($(TARGET_CHARSET),unicode)
+    DEF_CXX_MACRO += -D_UNICODE -DUNICODE
+    OUTPUT_CHARSET ?= U
+else
+    OUTPUT_CHARSET ?= M
+endif
+
+#------------------------------------------------------------------------------
+ifeq ($(TARGET_RELEASE),true)
+    DEF_CXX_MACRO += -DACE_NDEBUG -DNDEBUG
+    OUTPUT_RLEAASE ?= R
+else
+    DEF_CXX_MACRO += -D_DEBUG -DDEBUG
+    OUTPUT_RELEASE ?= D
+endif
+
+#------------------------------------------------------------------------------
+ifeq ($(TARGET_MACHINE),64)
+    OUTPUT_MACHINE ?= 64
+else
+    OUTPUT_MACHINE ?= 32
+endif
+#------------------------------------------------------------------------------
+#OUTPUT_SUFFIX ?= $(OUTPUT_CHARSET)$(OUTPUT_RLEAASE)$(OUTPUT_MACHINE)
+#OUTPUT_SUFFIX ?=
+#------------------------------------------------------------------------------
+SYM_SUFFIX ?= .gdb
+
+#------------------------------------------------------------------------------
+DLL_PREFIX ?= lib
+DLL_SUFFIX ?= .so
+
+#------------------------------------------------------------------------------
+LIB_PREFIX ?= lib
+LIB_SUFFIX ?= .a
+
+#------------------------------------------------------------------------------
+  C_BUILD ?= $(CC)
+CXX_BUILD ?= $(CXX)
+APP_BUILD ?= $(LD)
+DLL_BUILD ?= $(LD)
+LIB_BUILD ?= $(AR)
+
+#------------------------------------------------------------------------------
+# End
+#------------------------------------------------------------------------------

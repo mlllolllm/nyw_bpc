@@ -1,0 +1,55 @@
+#------------------------------------------------------------------------------
+# Makefile.dirs
+#------------------------------------------------------------------------------
+
+#------------------------------------------------------------------------------
+MAKE_CMD_GOALS := $(MAKECMDGOALS)
+ifeq '$(MAKE_CMD_GOALS)' ''
+	MAKE_CMD_GOALS := all
+endif
+
+#------------------------------------------------------------------------------
+ifneq '$(TARGET_LIST)' ''
+    $(MAKE_CMD_GOALS) : MAKE_TARGET_LIST
+    .PHONY : MAKE_TARGET_LIST
+endif
+
+#------------------------------------------------------------------------------
+ifneq '$(FOLDER_LIST)' ''
+    $(MAKE_CMD_GOALS) : MAKE_FOLDER_LIST
+    .PHONE: MAKE_FOLDER_LIST
+endif
+
+#------------------------------------------------------------------------------
+ECHO_PROMPTS := $(MAKE)[$(MAKELEVEL)]: Starting Make 
+MAKE_COMMAND := $(MAKE) --no-print-directory
+
+#------------------------------------------------------------------------------
+CURRENT_DIR := $(shell pwd)
+ECHO_FOLDER := $(ECHO_PROMPTS) Folder $(CURRENT_DIR)/
+ECHO_TARGET := $(ECHO_PROMPTS) $(CURRENT_DIR)
+
+#------------------------------------------------------------------------------
+ECHO_TARGET_CMD := echo $(ECHO_TARGET).$$Target $(MAKECMDGOALS)
+MAKE_TARGET_CMD := $(MAKE_COMMAND) -f Makefile.$$Target $(MAKECMDGOALS)
+MAKE_TARGET_COMMAND := $(ECHO_TARGET_CMD) ; $(MAKE_TARGET_CMD)
+
+#------------------------------------------------------------------------------
+ECHO_FOLDER_CMD := echo $(ECHO_FOLDER)$$Folder $(MAKECMDGOALS)
+MAKE_FOLDER_CMD := $(MAKE_COMMAND) -C $$Folder $(MAKECMDGOALS)
+MAKE_FOLDER_COMMAND := $(ECHO_FOLDER_CMD) ; $(MAKE_FOLDER_CMD)
+
+#------------------------------------------------------------------------------
+MAKE_TARGET_LIST :
+	@ for Target in $(TARGET_LIST); do $(MAKE_TARGET_COMMAND); done;
+
+#------------------------------------------------------------------------------
+MAKE_FOLDER_LIST :
+	@ for Folder in $(FOLDER_LIST); do $(MAKE_FOLDER_COMMAND); done;	
+
+#------------------------------------------------------------------------------
+.PHONY: $(MAKE_CMD_GOALS)
+
+#------------------------------------------------------------------------------
+# End Makefile
+#------------------------------------------------------------------------------

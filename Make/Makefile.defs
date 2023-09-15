@@ -1,0 +1,51 @@
+#------------------------------------------------------------------------------
+# Makefile.defs
+#------------------------------------------------------------------------------
+PROGRAMS_BASE := $(HOME)/nproject
+PROGRAMS_DIR := $(PROGRAMS_BASE)/code
+TOOLKITS_DIR := $(PROGRAMS_BASE)/thirdparty
+BUILDING_DIR := $(HOME)/app
+
+#------------------------------------------------------------------------------
+CCC_PATHS := -I. \
+             -I$(TOOLKITS_DIR)/include \
+			 -I$(TOOLKITS_DIR)/include/ace \
+             -I$(PROGRAMS_DIR)/include \
+             -I$(PROGRAMS_DIR)/app/event-driven-scheduler/cpp/TCPClient/json \
+             -I$(PROGRAMS_DIR)/include/plat \
+             -I$(PROGRAMS_DIR)/include/plat/nt_unix \
+             -I$(PROGRAMS_DIR)/include/plat/nt_unix/command \
+             -I$(PROGRAMS_DIR)/include/plat/nt_unix/rdp \
+             -I$(PROGRAMS_DIR)/include/plat/nt_unix/sgnp \
+             -I$(PROGRAMS_DIR)/include/das \
+             -I$(PROGRAMS_DIR)/app/mainstation/rdbaccess \
+			 -I$(PROGRAMS_DIR)/include/util \
+             -I$(PROGRAMS_DIR)/include/util/tcp \
+             -I$(PROGRAMS_DIR)/include/das/BPC \
+-I$(PROGRAMS_DIR)/include/das/dasbase\
+-I$(PROGRAMS_DIR)/include/das/dpf\
+-I$(PROGRAMS_DIR)/include/das/topana
+
+#------------------------------------------------------------------------------
+
+
+#------------------------------------------------------------------------------
+VPATH := $(PROGRAMS_DIR)/app
+
+#------------------------------------------------------------------------------
+INPUT_PATHS := -L$(BUILDING_DIR)/bin \
+
+#------------------------------------------------------------------------------
+# TARGET_CHARSET := unicode | ansi
+#TARGET_RELEASE := true
+#TARGET_MACHINE := 64 | 32
+#TARGET_MACHINE :=64
+LINK_SHARED :=true
+#------------------------------------------------------------------------------
+# PLATFORM_NAME := $(shell uname -s) [ Linux | SunOS | AIX | HP-UX ]
+# COMPILER_NAME := GCC | SCC | XLC | HPC
+
+#------------------------------------------------------------------------------
+# End
+#-----------------------------------------------------------------------
+

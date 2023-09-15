@@ -1,0 +1,28 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "/home/devapp/nproject/code/include/plat",
+                "/home/devapp/nproject/code/include/plat/nt_unix",
+                "/home/devapp/nproject/code/include/plat/nt",
+                "/home/devapp/nproject/code/include/plat/nt_unix/sgnp",
+                "/home/devapp/nproject/code/include/plat/nt_unix/rdp",
+                "/home/devapp/nproject/code/include/plat/nt_unix/command",
+                "/home/devapp/nproject/code/include/das/BPC",
+                "/home/devapp/nproject/code/include/das",
+                "/home/devapp/nproject/code/include/das/dpf",
+                "/home/devapp/nproject/code/include/das/dasbase",
+                "/home/devapp/nproject/code/include/das/topana",
+                "/home/devapp/nproject/thirdparty/include"
+            ],
+            "defines": [],
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "c11",
+            "cppStandard": "c++14",
+            "intelliSenseMode": "linux-gcc-x64"
+        }
+    ],
+    "version": 4
+}
