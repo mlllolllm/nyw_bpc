@@ -43,12 +43,12 @@ vmware workstation（所安装操作系统为centos7，请不要使用8，会出
 
 鉴于属于公司内部项目，没有vpn是无法完整运行的。外部人员请参考代码思路（小小小小的思路），其中主要实现功能的文件位于/home/devapp/nproject/code/app/das的两个文件夹中，BPC是本地运行使用的main文件，BPClib是方法的主要实现，BPC下进行make将生成可执行文件，BPClib下执行make将生成动态库，所生成均位于devapp/app/bin中
 1. 在虚拟机上新建devapp用户，将所有文件夹拷贝至devapp用户根目录下(/home/devapp)
-2. 连接vpn，设置网络：
-ifconfig virbr0 down
-brctl delbr virbr0
+2. 连接vpn，设置网络：	
+ifconfig virbr0 down	
+brctl delbr virbr0	
 systemctl disable libvirtd
 3. 于app/bin目录下先后执行命令
-./dppsrv
+./dppsrv	
 hda -d
 为数据库服务命令，需常驻
 4. 于/home/devapp/nproject/code/app/das/BPC下执行make -B,在/app/bin目录下运行BPC文件（或者在vscode中打开code文件夹，其中的.vscode都是配置好的，直接运行即可）
